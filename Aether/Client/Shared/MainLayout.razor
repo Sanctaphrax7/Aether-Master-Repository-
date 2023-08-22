@@ -1,0 +1,25 @@
+﻿@inherits LayoutComponentBase
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject HttpClient Http
+@inject IAccountService AccountService 
+@inject NavigationManager Nav
+
+<div class="page">
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+    <main>
+        <div class="top-row px-4">
+            <Logout />
+        </div>
+
+        <article class="content px-4">
+           <div class="main">
+            @Body
+            </div>
+        </article>
+    </main>
+</div>
+

@@ -1,0 +1,85 @@
+﻿@page "/"
+@inject NavigationManager NavigationManager
+@inject IAuthService AuthService
+@inject AuthStateProvider AuthStateProvider
+
+
+<h1>Sign In</h1>
+
+
+<form>
+    <EditForm Model="creds" OnValidSubmit="Login">
+    <div class="col-3">
+        <label for="username">Username</label>
+        <input type="text" class="form-control  mb-2" id="username" placeholder ="User Name" @bind="creds.UserName"/>
+    </div>
+    <div class="col-3 ">
+        <label for="password">Password</label>
+        <input type="password" class="form-control  mb-4" id="password" placeholder="Password" @bind="creds.Password"/>
+    </div>
+    <button type="submit" class="btn btn-primary btn-block" @onclick="Login">Sign In</button>
+    </EditForm>
+</form>
+
+
+
+@code {
+    private string? errorMessage;
+    UserDto creds = new UserDto();//Changed from User to UserDto 26/7/23
+
+
+    private async Task Login()
+    {
+
+        try
+        {
+            if(!string.IsNullOrEmpty(creds.UserName) && !string.IsNullOrEmpty(creds.Password))
+            {
+
+                var response = await AuthService.Login(creds);
+               
+
+                if(response.IsSuccessStatusCode){
+
+                    await AuthStateProvider.GetAuthenticationStateAsync();
+                    NavigationManager.NavigateTo("/home");
+                }
+                else
+                {
+                    errorMessage = "Invalid Credentials";
+                } 
+
+            }
+            else
+            {
+                errorMessage = ("Please enter your username or password correctly");
+            }
+        }
+        catch(Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        //try
+        //{
+        //    if (!string.IsNullOrEmpty(creds.UserName) && !string.IsNullOrEmpty(creds.Password))
+        //    {
+        //        await AuthStateProvider.Login(creds);
+        //        NavigationManager.NavigateTo("/home");
+
+        //    }
+        //    else
+        //    {
+        //        errorMessage = "Invalid Credentials";
+        //    }
+        //}
+        //catch (Exception ex)
+
+        //{
+
+        //    errorMessage = ex.Message;
+        //}
+        
+    }
+
+}
+

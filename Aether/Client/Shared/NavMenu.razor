@@ -1,0 +1,67 @@
+﻿@using System.Net.Http.Headers
+@inject HttpClient Http
+
+  <AuthorizeView>
+      <Authorized>
+    <div class="top-row ps-3 nav<Hero />bar navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="">Aether</a>
+            <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </div>
+    </Authorized>
+</AuthorizeView>
+
+    <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+        <nav class="flex-column">
+       <AuthorizeView>
+             <Authorized>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="home" Match="NavLinkMatch.All">
+                    <span class="oi oi-home" aria-hidden="true"></span> Aether
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="UploadFile" Match="NavLinkMatch.All">
+                    <span class="oi oi-arrow-top" aria-hidden="true"></span> Upload File
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="viewbudget">
+                    <span class="oi oi-eye" aria-hidden="true"></span> Budget Data
+                </NavLink>
+            </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="admin">
+                        <span class="oi oi-person" aria-hidden="true"></span> Admin Panel
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+         
+        @*<div class="nav-item px-3">
+            <NavLink class="nav-link" href="fetchdata">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+            </NavLink>
+        </div>*@
+        </nav>
+    </div>
+
+
+
+@code {
+
+
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+  
+}

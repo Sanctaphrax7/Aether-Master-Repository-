@@ -1,0 +1,101 @@
+﻿@*@implements IDisposable
+@inject IAlertService AlertService
+@inject NavigationManager NavigationManager
+
+@foreach(var alert in alerts)
+{
+    <div class=" = @CssClass(alert)">
+        <a class="class" @onclick="@(() => RemoveAlert(alert))">&times;</a>
+        <span>@alert.Message</span>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = "dafault-alert";
+
+    [Parameter]
+    public bool Fade { get; set; } = true;
+
+    private List<ClientModels.Alert> alerts = new List<ClientModels.Alert>();
+
+    protected override void OnInitialized()
+    {
+        AlertService.OnAlert += OnAlert;
+        NavigationManager.LocationChanged += OnLocationChange;
+    }
+
+    public void Dispose()
+    {
+        AlertService.OnAlert -= OnAlert;
+        NavigationManager.LocationChanged -= OnLocationChange;
+    }
+
+    public async void OnAlert(ClientModels.Alert alert)
+    {
+        if (alert.Id != Id)
+            return;
+
+        if(alert.Message == null)
+        {
+            alerts.RemoveAll(x => !x.KeepAfterRouteChange);
+            alerts.ForEach(x => x.KeepAfterRouteChange = false);
+        }
+        else
+        {
+            alerts.Add(alert);
+            StateHasChanged();
+
+            if (alert.AutoClose)
+            {
+                await Task.Delay(3000);
+                RemoveAlert(alert);
+            }
+        }
+        StateHasChanged();
+    }
+
+    private void OnLocationChange(object sender, LocationChangedEventArgs e)
+    {
+        AlertService.Clear(Id);
+    }
+
+    private async void RemoveAlert(ClientModels.Alert alert)
+    {
+        if (!alerts.Contains(alert)) return;
+
+        if(Fade)
+        {
+            alert.Fade = true;
+
+            await Task.Delay(250);
+            alerts.Remove(alert);
+        }
+        else
+        {
+            alerts.Remove(alert);
+        }
+        StateHasChanged();
+    }
+
+    private string CssClass(ClientModels.Alert alert)
+    {
+        if (alert == null) return null;
+
+        var classes = new List<string> {"alert" , "alert-dismissable", "mt-4", "container"};
+
+        var alertTypeClass = new Dictionary<AlertType, string>();
+        alertTypeClass[AlertType.Success] = "alert-success";
+        alertTypeClass[AlertType.Error] = "alert-danger";
+        alertTypeClass[AlertType.Info] = "alert-info";
+        alertTypeClass[AlertType.Warning] = "alert-warning";
+
+        classes.Add(alertTypeClass[alert.Type]);
+
+        if (alert.Fade)
+            classes.Add("fade");
+
+        return string.Join(' ', classes);
+    }
+}
+*@

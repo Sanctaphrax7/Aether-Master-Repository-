@@ -1,0 +1,72 @@
+﻿@page "/viewbudget"
+@inject IViewBudgetService ViewBudgetService
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
+
+
+<PageTitle>View Budget</PageTitle>
+
+<h3>Uploaded Budget</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Divsion</th>
+            <th scope="col">GlAccountNo</th>
+            <th scope="col">GlDeptNo</th>
+            <th scope="col">SubAccountNo</th>
+            <th scope="col">PerAmt</th>
+            <th scope="col">CompanyNo</th>
+            <th scope="col">Fiscal Year</th>
+            <th scope="col">Fiscal Month</th>
+            <th scope="col">CalMonth</th>
+            <th scope="col">RevisionNo</th>
+            <th scope="col">LastUpdated</th>
+            <th scope="col">UpdatedBy</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var budget in ViewBudgetService.Budgets)
+        {
+           <tr>  
+                <td>@budget.Division </td>
+                <td>@budget.GlAccountNo </td>
+                <td>@budget.GlDeptNo </td>
+                <td>@budget.SubAccountNo </td>
+                <td>@budget.PerAmt </td>
+                <td>@budget.CompanyNo </td>
+                <td>@budget.FiscalYear </td>
+                <td>@budget.FiscalMonth </td>
+                <td>@budget.CalMonth </td>
+                <td>@budget.RevisionNo </td>
+                <td>@budget.LastUpdated </td>
+                <td>@budget.UpdatedBy </td>
+                <td>
+                    <AuthorizeView Roles = "Admin">
+                        <button class="btn btn-primary" @onclick="(() => showBudget(budget.Id))"><i class="oi oi-pencil"></i></button>
+                    </AuthorizeView>
+                </td>
+           </tr>
+          
+        }
+    </tbody>
+</table>
+<button class="btn btn-primary mb-4" @onclick ="createBudget">Create New Budget</button>
+
+@code{
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ViewBudgetService.GetBudget();
+    }
+    void showBudget(int id)
+    {
+        NavigationManager.NavigateTo($"edit/{id}");
+    }
+    void createBudget()
+    {
+        NavigationManager.NavigateTo("/edit");
+    }
+
+
+}

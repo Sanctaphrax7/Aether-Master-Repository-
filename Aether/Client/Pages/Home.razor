@@ -1,0 +1,35 @@
+﻿@page "/home"
+@inject AuthStateProvider AuthState
+
+
+<PageTitle>Aether</PageTitle>
+
+<blockquote class="blockquote text-center">
+    <h1 class="mb-3 text-center">Aether</h1>
+
+    <h3>Welcome to Aether, The Budget Upload Application</h3>
+    <p class="mb-4">An Application Written by</p>
+    <footer class="blockquote-footer"><cite title="Source Title">Marc-Andrew Elie</cite></footer>
+
+</blockquote>
+
+
+
+<AuthorizeView Roles="User">
+    
+    <Authorized>
+        <p>Hello You're a regular User!</p>
+    </Authorized>
+   
+    <NotAuthorized>
+            
+    </NotAuthorized>
+
+</AuthorizeView>
+<AuthorizeView Roles ="Admin">
+    <p>Hey @context.User?.Identity?.Name you're an Admin</p>
+    <p>Your authentication status is: @context.User?.Identity?.IsAuthenticated</p>
+    <p>Your authentication type is: @context.User?.Identity?.AuthenticationType</p>
+    
+    @* <div> Full name: @AuthState</div> *@
+</AuthorizeView>

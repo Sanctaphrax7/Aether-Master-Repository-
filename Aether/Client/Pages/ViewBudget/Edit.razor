@@ -1,0 +1,128 @@
+﻿@page "/edit"
+@page "/edit/{id:int}"
+@inject IViewBudgetService ViewBudgetService
+@attribute [Authorize]
+
+@if(Id == null)
+{
+    <PageTitle>Create Budget</PageTitle>
+    <h3>Create New Budget</h3>
+}
+else
+{
+    <PageTitle>Edit @*@budgets.User*@</PageTitle>
+    <h3> Edit @*@budgets.User*@</h3>
+}
+<EditForm Model = "budgets" OnSubmit="HandleSubmit">
+    <div>
+        <label for = "division"> Division</label>
+        <InputText id="division" @bind-Value ="budgets.Division" class="form-control"></InputText>
+    </div>
+    <div>
+        <label for = "GlAccountNo"> GlAccountNo</label>
+        <InputText id="GlAccountNo" @bind-Value ="budgets.GlAccountNo" class="form-control"></InputText>
+    </div>
+    <div>
+        <label for = "GlDeptNo"> GlDeptNo</label>
+        <InputText id="GlDeptNo" @bind-Value ="budgets.GlDeptNo" class="form-control"></InputText>
+    </div>
+    <div>
+        <label for = "SubAccountNo"> SubAccountNo</label>
+        <InputText id="SubAccountNo" @bind-Value ="budgets.SubAccountNo" class="form-control"></InputText>
+    </div>
+    <div>
+        <label for = "PerAmt"> PerAmt</label>
+        <InputNumber id="PerAmt" @bind-Value ="budgets.PerAmt" class ="form-control"></InputNumber>
+    </div>
+    <div>
+        <label for = "CompanyNo"> CompanyNo</label>
+        <InputNumber id="CompanyNo" @bind-Value ="budgets.CompanyNo" class="form-control" min="1" max="4"></InputNumber>
+    </div>
+    <div>
+        <label for = "FicalYear"> Fiscal Year</label>
+        <InputNumber id="FiscalYear" @bind-Value ="budgets.FiscalYear" class="form-control"></InputNumber>
+    </div>
+    <div>
+        <label for = "FiscalMonth"> Fiscal Month </label>
+        <InputNumber id="FiscalMonth" @bind-Value="budgets.FiscalMonth" class="form-control" min ="1" max ="12"></InputNumber>
+    </div>
+    <div>
+        <label for = "CalMonth"> Calendar Month</label>
+        <InputNumber id="CalMonth" @bind-Value ="budgets.CalMonth" class="form-control" min ="1" max ="12"></InputNumber>
+    </div>
+    <div>
+        <label for = "RevisionNo"> Revision No</label>
+        <InputNumber id="RevisionNo" @bind-Value ="budgets.RevisionNo" class="form-control" min ="0"></InputNumber>
+    </div>
+   @* <div>
+        <label for = "LastUpdated"> Last Updated </label>
+        <InputDate id="LastUpdated" @bind-Value ="budgets.LastUpdated" class="form-control"></InputDate>
+    </div>
+    <div>
+        <label for = "Updated By"> Division</label>
+        <InputNumber id="Updated By" @bind-Value ="budgets.UpdatedBy" class="form-control"></InputNumber>
+    </div>*@
+    <div>
+        <label>User</label><br />
+        <InputSelect @bind-Value ="budgets.UserId" class ="form-select">
+            @foreach (var budgets in ViewBudgetService.Users)
+            {
+                <option value = "@budgets.Id">@budgets.UserName</option>
+            }
+        </InputSelect>
+    </div>
+    <br/>
+    <button type="submit" class="btn btn-primary">@BtnText</button>
+    <button type="button" class="btn btn-danger" @onclick ="DeleteBudget">Delete Budget</button>
+</EditForm>
+
+@code{
+    [Parameter]
+    public int? Id { get; set; }
+
+    string BtnText = string.Empty;
+
+    BudgetDatum budgets = new BudgetDatum(); //{ User = new User() };
+
+    protected override async Task OnInitializedAsync()
+    {
+        BtnText = Id == null ? "Save New Budget" : "Update Budget";
+        await ViewBudgetService.GetUsers();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if(Id == null)
+        {
+            budgets.User = ViewBudgetService.Users[0];
+            budgets.UserId = budgets.User.Id;
+            budgets.LastUpdated = DateTime.Now;
+            budgets.UpdatedBy = budgets.User.UserName;
+            
+            //budgets.UpdatedBy = budgets.UpdatedBy;
+        }
+        else
+        {
+            budgets = await ViewBudgetService.GetThisBudget((int)Id);
+        }
+    }
+    async Task HandleSubmit()
+    {  
+        if(Id == null)
+        {
+            await ViewBudgetService.CreateBudget(budgets);
+        }
+        else
+        {
+            await ViewBudgetService.UpdateBudget(budgets);
+            //await ViewBudgetService.GetThisBudget((int)Id);
+        }
+    }
+    async Task DeleteBudget()
+    {
+        await ViewBudgetService.DeleteBudget(budgets.Id);
+    }
+
+}
+
+
