@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.DirectoryServices.AccountManagement;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Aether.Server.Controllers
@@ -91,10 +92,17 @@ namespace Aether.Server.Controllers
                 new Claim(ClaimTypes.Role, user.Role)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-                _configuration.GetSection("AppSettings:Token").Value!));
+            //var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+              //  _configuration.GetSection("AppSettings:Token").Value!));
+              var key = new byte[64];
+              using (var rng = RandomNumberGenerator.Create())
+              {
+                  rng.GetBytes(key);
+              }
 
-            var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+              var signingKey = new SymmetricSecurityKey(key);
+
+            var cred = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512Signature);
             var token = new JwtSecurityToken(
                     claims: claims,
                     expires: DateTime.Now.AddDays(1),
