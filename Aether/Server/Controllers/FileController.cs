@@ -35,8 +35,8 @@ namespace Aether.Server.Controllers
             foreach (var file in files)
             {
                 var budgetDatum = new BudgetDatum();
-                 var currUser = await _context.Users.SingleOrDefaultAsync(u => u.UserName == "Marc-Andrew Elie");
-               // var currUser = await _context.Users.SingleOrDefaultAsync(u => u.UserName == creds.UserName);
+                var currUser = await _context.Users.SingleOrDefaultAsync(u => u.UserName == "ismel");
+                 // var currUser = await _context.Users.SingleOrDefaultAsync(u => u.UserName == creds.UserName);
                 string trustedFileNameForFileStorage;
                 string untrustedFileName = file.FileName;
                 var trustedFileNameForDisplay = WebUtility.HtmlEncode(untrustedFileName);

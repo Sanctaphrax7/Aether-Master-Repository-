@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Aether.Shared.Models;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
+using System.Security.Claims;
 
 namespace Aether.Shared.Models;
 
@@ -15,7 +10,8 @@ public partial class UserDto
     public string UserName { get; set; } = string.Empty;
     [Required]
     public string Password { get; set; } = string.Empty;
-  
 
+    //TEST
+   
 }
 

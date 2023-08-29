@@ -14,15 +14,15 @@ namespace Aether.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AlternateController : ControllerBase
     {
         public static User user = new User();
-      
+
         private readonly IConfiguration _configuration;
         private readonly DataContext _context;
-     
-        
-        public AuthController(DataContext context, IConfiguration configuration)
+
+
+        public AlternateController(DataContext context, IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration;
@@ -33,7 +33,6 @@ namespace Aether.Server.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserDto creds)
         {
-
             try
             {
                 using (PrincipalContext principalContext = new(ContextType.Domain, "10.120.110.86"))
@@ -41,23 +40,25 @@ namespace Aether.Server.Controllers
                     if (principalContext.ValidateCredentials(creds.UserName, creds.Password))
                     {
 
-                        if(!CheckUser(creds.UserName))
+
+                        if (!CheckUser(creds.UserName))
                         {
                             return BadRequest("You are not currently registered for this application. Contact IT Admin");
                         }
 
                         user = _context.Users.First(u => u.UserName == creds.UserName);
-                       
+
                         string token = CreateToken(user, creds);
                         Dictionary<string, object> response = new()
                         {
                             { "username", user.UserName },
-                            { "token", token } 
+                            { "token", token }
                         };
 
                         return Ok(response);
                     }
                 }
+
                 return Unauthorized("Invalid Credentials");
             }
             catch (PrincipalOperationException ex)
@@ -71,50 +72,34 @@ namespace Aether.Server.Controllers
 
         }
 
-        [HttpPost("logout")]
-        public async Task<IActionResult> Logout()
-        {
-            throw new NotImplementedException();
-        }
-
         private bool CheckUser(string userName)
         {
-            return _context.Users.Any(u => u.UserName == userName); 
+            return _context.Users.Any(u => u.UserName == userName);
         }
 
-        
         private string CreateToken(User user, UserDto creds)
         {
-            //This list of claims may become unnecessary if I am creating the claims within
-            //the user class. Needs some testing. 
 
-            List<Claim> claims = new List<Claim> {
-                //new Claim(ClaimTypes.Name, creds.UserName),//May be Redundant
-                //new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                //new Claim(ClaimTypes.Role, user.Role)
-            };
-
-            //var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-            //  _configuration.GetSection("AppSettings:Token").Value!));
             var key = new byte[64];
             using (var rng = RandomNumberGenerator.Create())
             {
                 rng.GetBytes(key);
-            }
+            } 
 
             var signingKey = new SymmetricSecurityKey(key);
 
             var cred = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha512Signature);
             var token = new JwtSecurityToken(
-                    //claims: claims,
-                    expires: DateTime.Now.AddDays(1),
-                    signingCredentials: cred
-                );
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials: cred
+            );
 
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
+
             return jwt;
         }
+
 
     }
 }

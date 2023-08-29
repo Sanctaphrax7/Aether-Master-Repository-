@@ -21,7 +21,6 @@ namespace Aether.Client.Services.AuthService
             _localStorageService = localStorageService;
             _sessionStorage = sessionStorage;
         }
-        public List<UserDto> Creds { get; set; } = new List<UserDto>();
 
         public async Task<HttpResponseMessage> Login(UserDto creds)
         {
