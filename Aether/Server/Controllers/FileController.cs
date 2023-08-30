@@ -6,6 +6,7 @@ using System.Net;
 using Aether.Server.Data;
 using CsvHelper;
 using System.Globalization;
+using Aether.Server.Authentication;
 using CsvHelper.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -112,13 +113,13 @@ namespace Aether.Server.Controllers
 
             return Ok("Budget Has Been Uploaded");
         }
-        //[HttpGet]
-        //public ActionResult<string> GetName()
-        //{
-        //    var username = _userService.GetName();
+        [HttpGet]
+        public ActionResult<string> GetName()
+        {
+            var username = 
 
-        //    return Ok(username);
-        //}
+            return Ok(username);
+        }
     }
 
 

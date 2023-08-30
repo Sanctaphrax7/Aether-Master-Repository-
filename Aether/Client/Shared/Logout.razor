@@ -1,6 +1,5 @@
-﻿@inject ILocalStorageService LocalStorage
-@inject ISessionStorageService SessionStorage
-@inject AuthenticationStateProvider AuthState
+﻿@inject ISessionStorageService SessionStorage
+@inject AuthStateProvider AuthState
 @inject NavigationManager Nav
 
 
@@ -17,9 +16,11 @@
 @code {
     async Task SignOut()
     {
-        //await LocalStorage.RemoveItemAsync("token");
-        await SessionStorage.RemoveItemAsync("token");
-        await AuthState.GetAuthenticationStateAsync();
-        Nav.NavigateTo("/");
+
+        var state = (AuthenticationStateProvider)AuthState;
+        await AuthState.UpdateAuthenticationState(null);
+        // await SessionStorage.RemoveItemAsync("token");
+        // await AuthState.GetAuthenticationStateAsync();
+        Nav.NavigateTo("/", true);
     }
 }

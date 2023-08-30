@@ -26,8 +26,8 @@ namespace Aether.Client.Services.AuthService
         public async Task<HttpResponseMessage> Login(UserDto creds)
         {
             var response = await _http.PostAsJsonAsync("api/Auth/login", creds);
-            var token = await response.Content.ReadAsStringAsync();
-            await _sessionStorage.SetItemAsStringAsync("token", token);
+            //var token = await response.Content.ReadAsStringAsync();
+            //await _sessionStorage.SetItemAsStringAsync("token", token);
 
 
             return response;
