@@ -19,9 +19,9 @@ public partial class ForgeContext : DbContext
 
     public virtual DbSet<BudgetDatum> BudgetData { get; set; }
 
-    public virtual DbSet<Comic> Comics { get; set; }
+    //public virtual DbSet<Comic> Comics { get; set; }
 
-    public virtual DbSet<SuperHero> SuperHeroes { get; set; }
+   // public virtual DbSet<SuperHero> SuperHeroes { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -82,12 +82,12 @@ public partial class ForgeContext : DbContext
                 .HasConstraintName("FK__BudgetDat__UserI__17F790F9");//This section may need to be commented out 
         });
 
-        modelBuilder.Entity<SuperHero>(entity =>
-        {
-            entity.HasIndex(e => e.ComicId, "IX_SuperHeroes_ComicId");
+        //modelBuilder.Entity<SuperHero>(entity =>
+        //{
+        //    entity.HasIndex(e => e.ComicId, "IX_SuperHeroes_ComicId");
 
-            entity.HasOne(d => d.Comic).WithMany(p => p.SuperHeroes).HasForeignKey(d => d.ComicId);
-        });
+        //    entity.HasOne(d => d.Comic).WithMany(p => p.SuperHeroes).HasForeignKey(d => d.ComicId);
+        //});
 
         modelBuilder.Entity<User>(entity =>
         {
