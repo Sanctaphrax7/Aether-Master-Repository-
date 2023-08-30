@@ -1,7 +1,9 @@
 ﻿@page "/"
+@using System.Net
 @inject NavigationManager NavigationManager
 @inject IAuthService AuthService
 @inject AuthStateProvider AuthStateProvider
+@inject IJSRuntime js
 
 
 <h1>Sign In</h1>
@@ -39,14 +41,17 @@
                 var response = await AuthService.Login(creds);
                
 
-                if(response.IsSuccessStatusCode){
-
-                    await AuthStateProvider.GetAuthenticationStateAsync();
-                    NavigationManager.NavigateTo("/home");
+                if(response.IsSuccessStatusCode)
+                {
+                    var userSession = await response.Content.ReadFromJsonAsync<UserSession>();
+                    //await AuthStateProvider.GetAuthenticationStateAsync();
+                    await AuthStateProvider.UpdateAuthenticationState(userSession);
+                    NavigationManager.NavigateTo("/home", true);
                 }
-                else
+                else if(response.StatusCode == HttpStatusCode.Unauthorized)
                 {
                     errorMessage = "Invalid Credentials";
+                    await js.InvokeVoidAsync("alert" + errorMessage);
                 } 
 
             }

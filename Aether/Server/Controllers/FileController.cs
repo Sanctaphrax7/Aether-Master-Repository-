@@ -18,13 +18,12 @@ namespace Aether.Server.Controllers
     {
         private readonly IWebHostEnvironment _env;
         private readonly DataContext _context;
-        private readonly IUserService _userService;
 
-        public FileController(IWebHostEnvironment env, DataContext context, IUserService userService)
+        public FileController(IWebHostEnvironment env, DataContext context)
         {
             _env = env;
             _context = context;
-            _userService = userService;
+        
 
         }
 
@@ -113,13 +112,13 @@ namespace Aether.Server.Controllers
 
             return Ok("Budget Has Been Uploaded");
         }
-        [HttpGet]
-        public ActionResult<string> GetName()
-        {
-            var username = _userService.GetName();
+        //[HttpGet]
+        //public ActionResult<string> GetName()
+        //{
+        //    var username = _userService.GetName();
 
-            return Ok(username);
-        }
+        //    return Ok(username);
+        //}
     }
 
 

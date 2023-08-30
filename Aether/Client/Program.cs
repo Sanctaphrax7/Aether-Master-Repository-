@@ -17,6 +17,7 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddScoped<IViewBudgetService, ViewBudgetService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 //builder.Services.AddScoped<IAlertService, AlertService>();
@@ -26,7 +27,7 @@ builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>(p => 
 builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddBlazoredLocalStorage();
-builder.Services.AddBlazoredSessionStorage();
+
 
 
 await builder.Build().RunAsync();
