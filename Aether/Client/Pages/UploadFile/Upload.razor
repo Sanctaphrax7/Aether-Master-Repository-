@@ -50,12 +50,22 @@
     private string? uploadMessage;
     private string? errorMessage;
     private string userdata;
+    private string userName;
+    //private string FileUploader;
 
     private void OnInputFileChange(InputFileChangeEventArgs e)
     {
         selectedFiles = e.GetMultipleFiles(maxAllowedFiles).ToList();
     }
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
 
+        userName = user.Identity.Name;
+       
+
+    }
     private async Task UploadFiles()
     {
         try
@@ -73,17 +83,17 @@
             {
                 var fileContent = new StreamContent(file.OpenReadStream(maxFileSize));
                 fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
-
                 fileNames.Add(file.Name);
 
+               // content.Add(new StringContent(userName), "userName");//Change 1/9/2023
                 content.Add(fileContent, "\"files\"", file.Name);
             }
-             //var state = (AuthenticationStateProvider)AuthProvider;
+
             var token = await AuthProvider.GetToken();
             if (!string.IsNullOrWhiteSpace(token))
             {
                 Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
-                var response = await Http.GetAsync("/api/File");//, content);
+                var response = await Http.PostAsync("/api/File/upload", content);
                 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {

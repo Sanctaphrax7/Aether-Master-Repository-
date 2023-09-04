@@ -1,9 +1,45 @@
 ﻿@page "/admin"
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin")]
 
 <h3>Admin</h3>
 <p>This page is designated for assigning user roles</p>
 
+<EditForm Model="users" OnSubmit="UpdateUser">
+
+    <div class="col-3">
+        <label for="" class="form-label">User Name</label>
+        <input type="text" class="form-control mb-2" placeholder="Active Directory User Name"/>
+    </div>
+    <div class ="col-3">
+        <label for="" class="form-label">Name</label>
+        <input type="text" class="form-control mb-2" placeholder="Government Name" />
+    </div>
+    <div class="col-3">
+        <label for="" class="form-label">Assign Role</label>
+        <select id="enable" class="form-select mb-2">
+            <option selected>Roles..</option>
+            <option>...</option>
+        </select>
+    </div>
+    <div class ="col-3">
+        <label for="" class="form-label">Enable/Disable</label>
+        <select id="enable" class="form-select mb-2">
+            <option selected>Choose...</option>
+            <option>...</option>
+        </select>
+    </div>
+
+
+
+</EditForm>
+
+
 @code {
 
+    User users = new User();
+
+    async Task UpdateUser()
+    {
+        throw new NotImplementedException();
+    }
 }

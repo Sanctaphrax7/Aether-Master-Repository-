@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using Aether.Client.Services.AuthStateProvider;
 using Aether.Server.Authentication;
@@ -37,6 +38,8 @@ builder.Services.AddAuthentication(options =>
             ValidateAudience = false,
         };
     });
+builder.Services.Configure<IdentityOptions>(options =>
+    options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier);
 
 var app = builder.Build();
 
