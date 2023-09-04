@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Identity;
 
 namespace Aether.Shared.Models
 {
-    public class UserSession
+    public class UserSession //: IUser<string>
     {
+        public int Id { get; set; }
         public string UserName { get; set; }
         public string Token { get; set; }
         public string Role { get; set; }

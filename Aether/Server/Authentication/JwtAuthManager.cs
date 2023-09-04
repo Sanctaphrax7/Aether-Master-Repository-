@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Aether.Shared.Models;
 using Microsoft.IdentityModel.Tokens;
+using Aether.Client.Services.AuthStateProvider;
 
 namespace Aether.Server.Authentication
 {
@@ -10,8 +11,8 @@ namespace Aether.Server.Authentication
     {
         public const string JwtSecurityKey = "HFaezx41W8rw5u9joTazZPGWLcq9DeKoJqe6l5Fs63gZ9saYhkhfdUaAZneCWxdc7cFusSjM5mbvYoxdO6F69TcTnSJ7h9T9Vtoik9ziiYbkPtR4FolU30tglr0Tg4aCJzi45QXyGfU8j5u2GJSQ0DnZOYolWsXi";
         private const int JwtValidityTime = 20;
-
         private UserAccountService _userAccountService;
+        
 
 
         public JwtAuthManager(UserAccountService userAccountService)
@@ -34,7 +35,8 @@ namespace Aether.Server.Authentication
             var key = Encoding.ASCII.GetBytes(JwtSecurityKey);
             var claimsIdentity = new ClaimsIdentity(new List<Claim>
             {
-                new Claim(ClaimTypes.Name, userAccount.UserName), 
+                new Claim(ClaimTypes.Name, userAccount.UserName),
+                new Claim(ClaimTypes.NameIdentifier, userAccount.Id.ToString()),
                 new Claim(ClaimTypes.Role, userAccount.Role)
             });
             var creds = new SigningCredentials(new SymmetricSecurityKey(key), 
@@ -55,6 +57,7 @@ namespace Aether.Server.Authentication
             {
                 UserName = userAccount.UserName,
                 Role = userAccount.Role,
+                Id = userAccount.Id,
                 Token = token,
                 ExpiresIn = (int)tokenExpiryTimeStamp.Subtract(DateTime.Now).TotalSeconds
             };

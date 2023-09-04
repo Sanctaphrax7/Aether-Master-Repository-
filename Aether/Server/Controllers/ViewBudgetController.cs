@@ -80,9 +80,8 @@ namespace Aether.Server.Controllers
             dbBudget.CalMonth = budget.CalMonth;
             dbBudget.RevisionNo = budget.RevisionNo;
             dbBudget.LastUpdated = DateTime.Now;
-            dbBudget.UserId = budget.UserId;//Added to test out solution to buggy CRUD
-            dbBudget.UpdatedBy = "Marc-Andrew Elie";
-                                 //Session["UserName"];
+            dbBudget.UserId = budget.UserId;
+            dbBudget.UpdatedBy = User.Identity?.Name;
 
             await _context.SaveChangesAsync();
 
