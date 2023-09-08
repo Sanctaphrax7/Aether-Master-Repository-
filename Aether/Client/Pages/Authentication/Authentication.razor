@@ -27,7 +27,7 @@
 
 @code {
     private string? errorMessage;
-    UserDto creds = new UserDto();//Changed from User to UserDto 26/7/23
+    UserDto creds = new UserDto();
 
 
     private async Task Login()
@@ -64,25 +64,7 @@
         {
             errorMessage = ex.Message;
         }
-        //try
-        //{
-        //    if (!string.IsNullOrEmpty(creds.UserName) && !string.IsNullOrEmpty(creds.Password))
-        //    {
-        //        await AuthStateProvider.Login(creds);
-        //        NavigationManager.NavigateTo("/home");
-
-        //    }
-        //    else
-        //    {
-        //        errorMessage = "Invalid Credentials";
-        //    }
-        //}
-        //catch (Exception ex)
-
-        //{
-
-        //    errorMessage = ex.Message;
-        //}
+       
         
     }
 

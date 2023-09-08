@@ -82,6 +82,7 @@ namespace Aether.Server.Controllers
             dbBudget.LastUpdated = DateTime.Now;
             dbBudget.UserId = budget.UserId;
             dbBudget.UpdatedBy = User.Identity?.Name;
+            dbBudget.FileName = "Manually Created";//TODO Check to see if this works well.
 
             await _context.SaveChangesAsync();
 

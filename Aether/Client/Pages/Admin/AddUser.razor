@@ -1,0 +1,80 @@
+﻿@page "/adduser"
+@using System.Net.Http.Headers
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject AuthStateProvider AuthProvider
+@inject IAdminService AdminService
+@attribute [Authorize(Roles ="Admin, SuperAdmin")]
+
+<h3>AddUser</h3>
+<p>This page is designated to adding new users to the application</p>
+
+<EditForm Model ="users" OnSubmit="CreateUser">
+    <div class ="col-3">
+        <label for= "UserName" class ="form-label"> User Name</label>
+        <InputText id="UserName" class="form-control mb-2" placeholder ="Active Directory Username" @bind-Value="users.UserName"/>
+    </div> 
+    <div class="col-3">
+        <label for="GivenName" class="form-label"> Given Name</label>
+        <InputText id="GivenName" class="form-control mb-2" placeholder ="Given" @bind-Value="users.Name"/>
+    </div>
+    <div class="col-3">
+        <label for ="Roles" class ="form-label">Assign Role</label>
+        <InputSelect @bind-Value ="users.Role" class="form-select mb-2">
+            @foreach (var roles in AdminService.Roles)
+            {
+                <option value ="@roles.Roles">@roles.Roles</option>
+            }
+        </InputSelect>
+    </div>
+   
+    <div>
+        <button type="submit" class="btn btn-primary mb-4" @onclick="CreateUser" disabled=@isSubmitting >Add User</button>
+    </div>
+
+</EditForm>
+@code {
+    User users = new User();
+    Role roles = new Role();
+
+    bool isSubmitting = false;
+
+    private async Task GetAuthState()
+    {
+        
+        var token = await AuthProvider.GetToken();
+        if(!string.IsNullOrWhiteSpace(token))
+        {
+            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //await Task.WhenAll(GetUserList(),GetRoleList());
+        await GetRoleList();
+        roles = AdminService.Roles[0];
+    }
+
+    private async Task CreateUser()
+    {
+        isSubmitting = true;
+        try
+        {
+            await GetAuthState();
+            await AdminService.AddUser(users);
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+    
+    private async Task GetRoleList()
+    {
+     
+        await GetAuthState();
+        await AdminService.GetRoleList();
+    }
+
+}

@@ -11,5 +11,7 @@ namespace Aether.Server.Data
         public DbSet<BudgetDatum> BudgetData{ get; set; } 
         public DbSet<User> Users { get; set; }
 
+        public DbSet<Role> Roles { get; set; }
+
     }
 }

@@ -5,9 +5,9 @@ using System.Globalization;
 
 namespace Aether.Shared.Models;
 
-public partial class BudgetDatum
+public class BudgetDatum
 {
- 
+
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
@@ -45,7 +45,7 @@ public partial class BudgetDatum
     {
         DateTime today = DateTime.Today;
         int firstMonth = 10;
-        int fiscalYear = today.Year;
+        int fiscalYear;
         if (today.Month > firstMonth)
         {
             fiscalYear = today.Year + 1;
@@ -91,7 +91,7 @@ public sealed class BudgetDatumMap : ClassMap<BudgetDatum>
         Map(m => m.UpdatedBy).Ignore();
         Map(m => m.UserId).Ignore();
         Map(m => m.FileName).Ignore();
-       //Map(m => m.User).Ignore();
+        //Map(m => m.User).Ignore();
 
     }
 }
