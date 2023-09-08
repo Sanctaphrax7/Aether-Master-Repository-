@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Aether.Client.Services.AccountService;
+using Aether.Client.Services.AdminService;
 
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -20,6 +21,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddScoped<IViewBudgetService, ViewBudgetService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
 //builder.Services.AddScoped<IAlertService, AlertService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<AuthStateProvider>();
