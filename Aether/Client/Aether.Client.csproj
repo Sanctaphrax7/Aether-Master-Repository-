@@ -37,6 +37,7 @@
 
   <ItemGroup>
     <Folder Include="Authentication\" />
+    <Folder Include="wwwroot\bootstrap\" />
   </ItemGroup>
 
 </Project>
