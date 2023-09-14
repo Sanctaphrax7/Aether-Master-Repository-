@@ -1,6 +1,10 @@
 ﻿@page "/viewbudget"
+@using System.Net.Http.Headers
+@using Aether.Client.Services.ViewBudgetService
 @inject IViewBudgetService ViewBudgetService
 @inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject AuthStateProvider AuthProvider
 @attribute [Authorize]
 
 
@@ -11,7 +15,7 @@
 <table class="table">
     <thead>
         <tr>
-            <th scope="col">Divsion</th>
+            <th scope="col">Division</th>
             <th scope="col">GlAccountNo</th>
             <th scope="col">GlDeptNo</th>
             <th scope="col">SubAccountNo</th>
@@ -43,7 +47,7 @@
                 <td>@budget.UpdatedBy </td>
                 <td>
                     <AuthorizeView Roles = "Admin">
-                        <button class="btn btn-primary" @onclick="(() => showBudget(budget.Id))"><i class="oi oi-pencil"></i></button>
+                        <button class="btn btn-primary" @onclick="(() => ShowBudget(budget.Id))"><i class="oi oi-pencil"></i></button>
                     </AuthorizeView>
                 </td>
            </tr>
@@ -51,20 +55,34 @@
         }
     </tbody>
 </table>
-<button class="btn btn-primary mb-4" @onclick ="createBudget">Create New Budget</button>
+<button class="btn btn-primary mb-4" @onclick ="CreateBudget">Create New Budget</button>
 
 @code{
 
+    private async Task GetAuthState()
+    {
+        
+        var token = await AuthProvider.GetToken();
+        if(!string.IsNullOrWhiteSpace(token))
+        {
+            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+        }
+    }
+
     protected override async Task OnInitializedAsync()
     {
+        await GetAuthState();
         await ViewBudgetService.GetBudget();
     }
-    void showBudget(int id)
+
+    async Task ShowBudget(int id)
     {
+        await GetAuthState();
         NavigationManager.NavigateTo($"edit/{id}");
     }
-    void createBudget()
+    async Task CreateBudget()
     {
+        await GetAuthState();
         NavigationManager.NavigateTo("/edit");
     }
 

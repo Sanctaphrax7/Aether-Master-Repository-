@@ -6,7 +6,11 @@ using System.Net;
 using Aether.Server.Data;
 using CsvHelper;
 using System.Globalization;
+using System.Security.Claims;
+using Aether.Server.Authentication;
 using CsvHelper.Configuration;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -18,37 +22,33 @@ namespace Aether.Server.Controllers
     {
         private readonly IWebHostEnvironment _env;
         private readonly DataContext _context;
-        private readonly IUserService _userService;
+        private UserAccountService _userAccountService;
 
-        public FileController(IWebHostEnvironment env, DataContext context, IUserService userService)
+        public FileController(IWebHostEnvironment env, DataContext context, UserAccountService userAccountService)
         {
             _env = env;
             _context = context;
-            _userService = userService;
+            _userAccountService = userAccountService;
 
         }
 
-        [HttpPost]
+        [HttpPost("upload")]
         public async Task<ActionResult<List<BudgetDatum>>> UploadFile(List<IFormFile> files)
         {
 
             foreach (var file in files)
             {
                 var budgetDatum = new BudgetDatum();
-                 var currUser = await _context.Users.SingleOrDefaultAsync(u => u.UserName == "Marc-Andrew Elie");
-               // var currUser = await _context.Users.SingleOrDefaultAsync(u => u.UserName == creds.UserName);
                 string trustedFileNameForFileStorage;
                 string untrustedFileName = file.FileName;
-                var trustedFileNameForDisplay = WebUtility.HtmlEncode(untrustedFileName);
+                //var trustedFileNameForDisplay = WebUtility.HtmlEncode(untrustedFileName);
 
                 trustedFileNameForFileStorage = Path.GetRandomFileName();
                 var path = Path.Combine(_env.ContentRootPath, "uploads", trustedFileNameForFileStorage);
 
                 await using (FileStream fs = new(path, FileMode.Create))
                 {
-                    
                     await file.CopyToAsync(fs);
-
                 }
 
                 var config = new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -60,50 +60,58 @@ namespace Aether.Server.Controllers
                 using (var reader = new StreamReader(path))
                 using (var csv = new CsvReader(reader, config))
                 {
-                    csv.Context.RegisterClassMap<BudgetDatumMap>(); 
+                    csv.Context.RegisterClassMap<BudgetDatumMap>();
                     var records = csv.GetRecords<BudgetDatum>();
-
+                   // var userId = User.FindFirst(c=> c.Type.Contains("nameidentifier"));
+                   //var userId = _context.Users.FirstOrDefaultAsync(u => u.UserName == User.Identity.Name);
+                    //var userId = User.FindFirst(c =>  ClaimTypes.NameIdentifier != null).Value;//Where(ClaimTypes.NameIdentifier != null);
+                    var user = GetSession();
+                    
                     try
                     {
                         foreach (var record in records)
                         {
-                           // var user = await _context.Users.SingleOrDefaultAsync(u => u.Id == record.Id);
-                           // if (user != null)
-                           // {
-                                if (record.CalMonth < 1 || record.CalMonth > 12 && record.FiscalYear !> budgetDatum.FiscalYear)
-                                {
-                                    ModelState.AddModelError(string.Empty, "Invalid Calendar Month value. It must be between 1 and 12.");
-                                    return BadRequest(ModelState);
-                                }
 
+                            if (record.CalMonth < 1 || record.CalMonth > 12 && record.FiscalYear ! > budgetDatum.FiscalYear)
+                            {
+                                ModelState.AddModelError(string.Empty,
+                                    "Invalid Calendar Month value. It must be between 1 and 12.");
+                                return BadRequest(ModelState);
+                            }
 
-                                var data = new BudgetDatum
-                                {
+                            // if (userId is null || !int.TryParse(userId.Value, out int nameID))
+                            //if(userId.Result.Id == null) 
+                            //{
+                            //    return BadRequest("Missing User Id!");
+                            //}
 
-                                    Division = record.Division,
-                                    GlAccountNo = record.GlAccountNo,
-                                    GlDeptNo = record.GlDeptNo,
-                                    SubAccountNo = record.SubAccountNo,
-                                    PerAmt = record.PerAmt,
-                                    CompanyNo = record.CompanyNo,
-                                    FiscalYear = record.FiscalYear,
-                                    FiscalMonth = record.FiscalMonth,
-                                    CalMonth = record.CalMonth,
-                                    RevisionNo = record.RevisionNo,
-                                    UpdatedBy = currUser?.UserName,
-                                    UserId = currUser?.Id,
-                                    LastUpdated = DateTime.Now,
-                                    FileName = file.FileName.ToString()
-                                };
-                                _context.BudgetData.Add(data);
-                         //   }
+                            var data = new BudgetDatum
+                            {
+
+                                Division = record.Division,
+                                GlAccountNo = record.GlAccountNo,
+                                GlDeptNo = record.GlDeptNo,
+                                SubAccountNo = record.SubAccountNo,
+                                PerAmt = record.PerAmt,
+                                CompanyNo = record.CompanyNo,
+                                FiscalYear = record.FiscalYear,
+                                FiscalMonth = record.FiscalMonth,
+                                CalMonth = record.CalMonth,
+                                RevisionNo = record.RevisionNo,
+                                UpdatedBy = user?.UserName,
+                                UserId = user?.Id,
+                                LastUpdated = DateTime.Now,
+                                FileName = file.FileName.ToString()
+                            };
+                            _context.BudgetData.Add(data);
+                            
 
                         }
                     }
                     catch (Exception ex)
                     {
                         return BadRequest(ex.Message);
-                        
+
                     }
                 }
 
@@ -113,13 +121,24 @@ namespace Aether.Server.Controllers
 
             return Ok("Budget Has Been Uploaded");
         }
-        [HttpGet]
-        public ActionResult<string> GetName()
-        {
-            var username = _userService.GetName();
 
-            return Ok(username);
+        private UserSession? GetSession()
+        {
+
+            var userAccount = _userAccountService.GetUserAccountByUserName(User.Identity.Name);
+            if (userAccount == null)
+                return null;
+
+            var userSession = new UserSession
+            {
+                UserName = userAccount.UserName,
+                Id = userAccount.Id
+            };
+
+            return userSession;
         }
+
+
     }
 
 

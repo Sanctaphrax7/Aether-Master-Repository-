@@ -1,7 +1,8 @@
 ﻿@page "/edit"
 @page "/edit/{id:int}"
+@using Aether.Client.Services.ViewBudgetService
 @inject IViewBudgetService ViewBudgetService
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin")]
 
 @if(Id == null)
 {
@@ -10,8 +11,8 @@
 }
 else
 {
-    <PageTitle>Edit @*@budgets.User*@</PageTitle>
-    <h3> Edit @*@budgets.User*@</h3>
+    <PageTitle>Edit by: @budgets.UpdatedBy</PageTitle>
+    <h3> Edit </h3>
 }
 <EditForm Model = "budgets" OnSubmit="HandleSubmit">
     <div>
@@ -54,7 +55,7 @@ else
         <label for = "RevisionNo"> Revision No</label>
         <InputNumber id="RevisionNo" @bind-Value ="budgets.RevisionNo" class="form-control" min ="0"></InputNumber>
     </div>
-   @* <div>
+    @* <div>
         <label for = "LastUpdated"> Last Updated </label>
         <InputDate id="LastUpdated" @bind-Value ="budgets.LastUpdated" class="form-control"></InputDate>
     </div>
@@ -62,15 +63,16 @@ else
         <label for = "Updated By"> Division</label>
         <InputNumber id="Updated By" @bind-Value ="budgets.UpdatedBy" class="form-control"></InputNumber>
     </div>*@
-    <div>
-        <label>User</label><br />
-        <InputSelect @bind-Value ="budgets.UserId" class ="form-select">
-            @foreach (var budgets in ViewBudgetService.Users)
-            {
-                <option value = "@budgets.Id">@budgets.UserName</option>
-            }
-        </InputSelect>
-    </div>
+        <div>
+            <label>User</label><br />
+            <InputSelect @bind-Value ="budgets.UserId" class ="form-select">
+                @foreach (var budgets in ViewBudgetService.Users)
+                {
+                    <option value = "@budgets.Id">@budgets.UserName</option>
+                }
+            </InputSelect>
+        </div>
+    
     <br/>
     <button type="submit" class="btn btn-primary">@BtnText</button>
     <button type="button" class="btn btn-danger" @onclick ="DeleteBudget">Delete Budget</button>

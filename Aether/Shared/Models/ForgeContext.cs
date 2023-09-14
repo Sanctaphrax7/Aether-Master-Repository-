@@ -19,11 +19,11 @@ public partial class ForgeContext : DbContext
 
     public virtual DbSet<BudgetDatum> BudgetData { get; set; }
 
-    public virtual DbSet<Comic> Comics { get; set; }
-
-    public virtual DbSet<SuperHero> SuperHeroes { get; set; }
+    public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
+
+    public virtual DbSet<UserRole> UserRoles { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
@@ -79,14 +79,16 @@ public partial class ForgeContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.BudgetData)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__BudgetDat__UserI__17F790F9");//This section may need to be commented out 
+                .HasConstraintName("FK__BudgetDat__UserI__17F790F9");
         });
 
-        modelBuilder.Entity<SuperHero>(entity =>
+        modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasIndex(e => e.ComicId, "IX_SuperHeroes_ComicId");
+            entity.HasKey(e => e.Id).HasName("PK__Roles__3214EC07E06A44C6");
 
-            entity.HasOne(d => d.Comic).WithMany(p => p.SuperHeroes).HasForeignKey(d => d.ComicId);
+            entity.Property(e => e.Roles)
+                .HasMaxLength(255)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -94,8 +96,28 @@ public partial class ForgeContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Users__3214EC27C673ED97");
 
             entity.Property(e => e.Id).HasColumnName("ID");
-           // entity.Property(e => e.Password).HasMaxLength(100);
+            entity.Property(e => e.Name)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.Role)
+                .HasMaxLength(20)
+                .IsUnicode(false);
             entity.Property(e => e.UserName).HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<UserRole>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__UserRole__3214EC0760F8A825");
+
+            entity.HasOne(d => d.Role).WithMany(p => p.UserRoles)
+                .HasForeignKey(d => d.RoleId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("RoleId");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserRoles)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("UserId");
         });
 
         OnModelCreatingPartial(modelBuilder);

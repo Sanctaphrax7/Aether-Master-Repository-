@@ -1,4 +1,5 @@
 ﻿@page "/home"
+@using Microsoft.AspNet.Identity
 @inject AuthStateProvider AuthState
 
 
@@ -27,9 +28,29 @@
 
 </AuthorizeView>
 <AuthorizeView Roles ="Admin">
-    <p>Hey @context.User?.Identity?.Name you're an Admin</p>
+    <p>Hey @userName you're an Admin</p>
     <p>Your authentication status is: @context.User?.Identity?.IsAuthenticated</p>
     <p>Your authentication type is: @context.User?.Identity?.AuthenticationType</p>
+    <p>This name is provided by the AuthStateProvider @userName</p>
     
     @* <div> Full name: @AuthState</div> *@
 </AuthorizeView>
+
+
+@code{
+
+    private string userName;
+    private string role;
+    
+
+    protected override async Task OnInitializedAsync()
+    {
+       var authState = await AuthState.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        userName = user.Identity.Name;
+       
+
+    }
+
+}

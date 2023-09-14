@@ -25,12 +25,10 @@ namespace Aether.Client.Services.AuthService
 
         public async Task<HttpResponseMessage> Login(UserDto creds)
         {
-            //var content = new StringContent(JsonConvert.SerializeObject(creds), Encoding.UTF8, "application/json");
             var response = await _http.PostAsJsonAsync("api/Auth/login", creds);
-            var token = await response.Content.ReadAsStringAsync();
-            await _sessionStorage.SetItemAsStringAsync("token", token);
+            //var token = await response.Content.ReadAsStringAsync();
+            //await _sessionStorage.SetItemAsStringAsync("token", token);
 
-            //await _localStorageService.SetItemAsStringAsync("token", token);
 
             return response;
         }

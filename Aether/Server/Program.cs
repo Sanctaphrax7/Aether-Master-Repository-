@@ -1,6 +1,7 @@
-global using Aether.Server.Services;
+using System.Security.Claims;
 using System.Text;
 using Aether.Client.Services.AuthStateProvider;
+using Aether.Server.Authentication;
 using Aether.Server.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -16,25 +17,29 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-//builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<DataContext>();//Can add options here - Auth Update
-//builder.Services.AddSession(); //Add if necessary //Not Necessary in Blazor WASM 
-//builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>(p => p.GetRequiredService<AuthStateProvider>());
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
+//builder.Services.AddSingleton<UserAccountService>();
+builder.Services.AddScoped<UserAccountService>();
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+
         options.TokenValidationParameters = new()
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey =
-                new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value)),
+                new SymmetricSecurityKey(Encoding.ASCII.GetBytes(JwtAuthManager.JwtSecurityKey)),
             ValidateIssuer = false,
             ValidateAudience = false,
-            ClockSkew = TimeSpan.Zero
         };
     });
+builder.Services.Configure<IdentityOptions>(options =>
+    options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier);
 
 var app = builder.Build();
 

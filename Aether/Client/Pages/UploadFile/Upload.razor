@@ -4,9 +4,11 @@
 @using Aether.Shared.Models
 @using System.Text.Json
 @using Microsoft.EntityFrameworkCore
+@inject AuthStateProvider AuthProvider
+@inject NavigationManager Nav
 @inject HttpClient Http
 @inject IJSRuntime jsr
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin, User")]
 
 <PageTitle>Upload Csv Files</PageTitle>
 
@@ -48,24 +50,22 @@
     private string? uploadMessage;
     private string? errorMessage;
     private string userdata;
+    private string userName;
+    //private string FileUploader;
 
     private void OnInputFileChange(InputFileChangeEventArgs e)
     {
         selectedFiles = e.GetMultipleFiles(maxAllowedFiles).ToList();
     }
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
 
-    // private async Task<string> GetJWT()
-    // {
-    //     userdata = await jsr.InvokeAsync<string>("sessionStorage.getItem", "token").ConfigureAwait(false);
-    //     if (!string.IsNullOrWhiteSpace(userdata))
-    //     {
-    //         var dataArray = userdata.Split(';', 2);
-    //         if (dataArray.Length == 2)
-    //             return dataArray[1];
-    //     }
-    //     return null;
-    // }
+        userName = user.Identity.Name;
+       
 
+    }
     private async Task UploadFiles()
     {
         try
@@ -83,32 +83,41 @@
             {
                 var fileContent = new StreamContent(file.OpenReadStream(maxFileSize));
                 fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
-
                 fileNames.Add(file.Name);
 
+               // content.Add(new StringContent(userName), "userName");//Change 1/9/2023
                 content.Add(fileContent, "\"files\"", file.Name);
             }
-           
 
-
-             var response = await Http.GetAsync("/api/File");//, content);
+            var token = await AuthProvider.GetToken();
+            if (!string.IsNullOrWhiteSpace(token))
+            {
+                Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                var response = await Http.PostAsync("/api/File/upload", content);
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                
+                    uploadMessage = "Budget File Uploaded Successfully!";
+                    errorMessage = null;
+                }
+                else
+                {
+                    errorMessage = response.Content.ToString();
+                }
+            }
+            else
+            {
+                Nav.NavigateTo("/");
+            }
              //response.Headers.Add("Authorization", "Bearer" + await GetJWT());
 
             // var request = new HttpRequestMessage(HttpMethod.Get, "/api/File");
             // request.Headers.Add("Authorization", "Bearer" + await GetJWT());
             // var response = await Http.SendAsync(request);
             
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                
-                uploadMessage = "Budget File Uploaded Successfully!";
-                errorMessage = null;
-            }
-            else
-            {
-                errorMessage = response.Content.ToString();
-            }
-            }
+            
+        }
             catch (DbUpdateException ex)
             {
                 if(ex.InnerException is SqlException sqlException /*&& sqlException.Number == 2601*/)
@@ -123,13 +132,13 @@
              catch (Exception ex)
             {
                 errorMessage = ex.StackTrace;
-            
-
             }
             finally
             {
                 isUploading = false;
+
             }
+
     }
 
    

@@ -1,9 +1,131 @@
 ﻿@page "/admin"
-@attribute [Authorize]
+@using System.Net.Http.Headers
+@inject IAdminService AdminService
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject AuthStateProvider AuthProvider
+@attribute [Authorize(Roles = "Admin , SuperAdmin")]
 
-<h3>Admin</h3>
-<p>This page is designated for assigning user roles</p>
+<h3>Administrative Panel</h3>
+<p>This page is designated for updating users and reassigning roles</p>
+
+<EditForm Model="users" OnSubmit="UpdateUser">
+
+    <div class="col-3">
+        <label>User Name</label>
+        <InputSelect @bind-Value="selectUserName" class="form-select" @onchange="LoadUserData">
+            @foreach (var users in AdminService.Users)
+            {
+                <option value="@users.UserName">@users.UserName - @users.Name</option>
+            }
+        </InputSelect>
+    </div>
+    <div class="col-3">
+        <label for="" class="form-label">Name</label>
+        <InputText @bind-Value="users.Name" class="form-control mb-2" placeholder="Given Name" />
+    </div>
+    <div class="col-3">
+        <label for="Roles" class="form-label">Assign Role</label>
+        <InputSelect @bind-Value="users.Role" class="form-select mb-2">
+            @foreach (var roles in AdminService.Roles)
+            {
+                <option value="@roles.Roles">@roles.Roles</option>
+            }
+        </InputSelect>
+    </div>
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="enableRadio" @bind="users.Enabled">
+        <label class="form-check-label" for="enable">Enable</label>
+    </div>
+
+    <div>
+        <button class="btn btn-primary mb-4" @onclick="CreateUser">Create New User</button>
+    </div>
+    <div>
+        <button class="btn btn-primary mb-4" @onclick="UpdateUser">Update User</button>
+    </div>
+
+
+
+</EditForm>
+
 
 @code {
+    User users = new();
+    Role roles = new();
+    string selectUserName;
+    bool isSubmitting = false;
+
+
+    //TODO Implement Disable and Enable functionality, should just be a simple hard coded value.
+    //TODO Investigate why selecting UserName and Name mismatches on occasion
+    //TODO Try implementing automated populating of user related attributes(when UserName is selected)
+    //TODO Add any further quality of life improvements if necessary...like a back button....
+
+    private async Task GetAuthState()
+    {
+
+        var token = await AuthProvider.GetToken();
+        if (!string.IsNullOrWhiteSpace(token))
+        {
+            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.WhenAll(GetUserList(), GetRoleList());
+        if (AdminService.Users.Count > 0)
+        {
+            selectUserName = AdminService.Users[0].UserName;
+        }
+        LoadUserData();
+        // users = AdminService.Users[0];
+    }
+
+    private async Task GetUserList()
+    {
+
+        await GetAuthState();
+        await AdminService.GetUserList();
+    }
+
+    private async Task GetRoleList()
+    {
+
+        await GetAuthState();
+        await AdminService.GetRoleList();
+    }
+
+    private async Task CreateUser()
+    {
+        await GetAuthState();
+        NavigationManager.NavigateTo("/adduser");
+    }
+
+    private async Task UpdateUser()
+    {
+        isSubmitting = true;
+        try
+        {
+            await GetAuthState();
+            await AdminService.UpdateUser(users);
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private void LoadUserData()
+    {
+        var selectedUser = AdminService.Users.FirstOrDefault(u => u.UserName == selectUserName);
+        if (selectedUser != null)
+        {
+            users.UserName = selectedUser.UserName;
+            users.Name = selectedUser.Name;
+            users.Enabled = selectedUser.Enabled;
+        }
+    }
 
 }

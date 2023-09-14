@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Authentication\**" />
+    <Content Remove="Authentication\**" />
+    <EmbeddedResource Remove="Authentication\**" />
+    <None Remove="Authentication\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
     <PackageReference Include="Blazored.SessionStorage" Version="2.4.0" />
@@ -28,10 +35,15 @@
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
     <PackageReference Include="System.DirectoryServices.AccountManagement" Version="7.0.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.32.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Shared\Aether.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\bootstrap\" />
   </ItemGroup>
 
 </Project>

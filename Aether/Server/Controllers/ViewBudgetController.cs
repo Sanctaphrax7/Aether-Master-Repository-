@@ -49,6 +49,11 @@ namespace Aether.Server.Controllers
             return Ok(budgets);
 
         }
+        //[HttpGet("{id}")]
+        //public async Task GetComment(int id)//TODO To be implemented!
+        //{
+        //    throw new NotImplementedException();
+        //}
       
         [HttpPost]
         public async Task<ActionResult<List<BudgetDatum>>> CreateBudget(BudgetDatum budget)
@@ -80,9 +85,9 @@ namespace Aether.Server.Controllers
             dbBudget.CalMonth = budget.CalMonth;
             dbBudget.RevisionNo = budget.RevisionNo;
             dbBudget.LastUpdated = DateTime.Now;
-            dbBudget.UserId = budget.UserId;//Added to test out solution to buggy CRUD
-            dbBudget.UpdatedBy = "Marc-Andrew Elie";
-                                 //Session["UserName"];
+            dbBudget.UserId = budget.UserId;
+            dbBudget.UpdatedBy = User.Identity?.Name;
+            dbBudget.FileName = "Manually Created";//TODO Check to see if this works well.
 
             await _context.SaveChangesAsync();
 
