@@ -37,7 +37,7 @@ namespace Aether.Server.Authentication
             {
                 new Claim(ClaimTypes.Name, userAccount.UserName),
                 new Claim(ClaimTypes.NameIdentifier, userAccount.Id.ToString()),
-                new Claim(ClaimTypes.GivenName, userAccount.Name),//TODO Name field added(AUTH MANAGER1)
+                new Claim(ClaimTypes.GivenName, userAccount.Name),
                 new Claim(ClaimTypes.Role, userAccount.Role)
             });
             var creds = new SigningCredentials(new SymmetricSecurityKey(key), 
@@ -57,9 +57,10 @@ namespace Aether.Server.Authentication
             var userSession = new UserSession
             {
                 UserName = userAccount.UserName,
-                Name = userAccount.Name,//TODO Name field added(AUTH MANAGER2)
+                Name = userAccount.Name,
                 Role = userAccount.Role,
                 Id = userAccount.Id,
+                Enabled = userAccount.Enabled,
                 Token = token,
                 ExpiresIn = (int)tokenExpiryTimeStamp.Subtract(DateTime.Now).TotalSeconds
             };

@@ -1,5 +1,6 @@
 ﻿@page "/edit"
 @page "/edit/{id:int}"
+@using Aether.Client.Services.ViewBudgetService
 @inject IViewBudgetService ViewBudgetService
 @attribute [Authorize(Roles = "Admin")]
 

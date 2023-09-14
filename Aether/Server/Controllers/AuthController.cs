@@ -51,6 +51,10 @@ namespace Aether.Server.Controllers
                         {
                             return Unauthorized();
                         }
+                        if (userSession.Enabled == false)
+                        {
+                            return Unauthorized();
+                        }
                         else
                         {
                             return userSession;

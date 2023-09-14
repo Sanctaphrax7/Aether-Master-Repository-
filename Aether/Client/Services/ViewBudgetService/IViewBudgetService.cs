@@ -1,6 +1,4 @@
-﻿using Aether.Shared.Models;
-
-namespace Aether.Client.Services.BudgetViewService
+﻿namespace Aether.Client.Services.ViewBudgetService
 {
     public interface IViewBudgetService
     {
@@ -9,6 +7,7 @@ namespace Aether.Client.Services.BudgetViewService
         Task GetUsers();
         Task GetBudget();
         Task<BudgetDatum> GetThisBudget(int id);
+        //Task GetComment(int id); //TODO To Be Implemented
         Task CreateBudget(BudgetDatum budget);
         Task UpdateBudget(BudgetDatum budget);
         Task DeleteBudget(int id);
