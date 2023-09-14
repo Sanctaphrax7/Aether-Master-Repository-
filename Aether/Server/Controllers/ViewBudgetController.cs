@@ -49,6 +49,11 @@ namespace Aether.Server.Controllers
             return Ok(budgets);
 
         }
+        //[HttpGet("{id}")]
+        //public async Task GetComment(int id)//TODO To be implemented!
+        //{
+        //    throw new NotImplementedException();
+        //}
       
         [HttpPost]
         public async Task<ActionResult<List<BudgetDatum>>> CreateBudget(BudgetDatum budget)

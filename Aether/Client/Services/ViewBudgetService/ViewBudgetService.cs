@@ -1,8 +1,7 @@
-﻿using Aether.Shared.Models;
+﻿using System.Net.Http.Json;
 using Microsoft.AspNetCore.Components;
-using System.Net.Http.Json;
 
-namespace Aether.Client.Services.BudgetViewService
+namespace Aether.Client.Services.ViewBudgetService
 {
     public class ViewBudgetService : IViewBudgetService
     {
@@ -53,6 +52,12 @@ namespace Aether.Client.Services.BudgetViewService
             if (result != null)
                 Budgets = result;
         }
+        //public async Task GetComment() //TODO To Be Implemented 
+        //{
+        //    var result = await _http.GetFromJsonAsync<List<BudgetDatum>>("api/viewbudget/comment");
+        //    if (result != null)
+        //        await SetBudgetComment(result);
+        //}
         public async Task UpdateBudget(BudgetDatum budget)
         {
             var result = await _http.PutAsJsonAsync($"api/viewbudget/{budget.Id}", budget);

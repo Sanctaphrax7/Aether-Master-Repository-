@@ -1,4 +1,3 @@
-global using Aether.Client.Services.BudgetViewService;
 global using Aether.Shared.Models;
 global using Microsoft.AspNetCore.Components.Authorization;
 global using Blazored.LocalStorage;
@@ -11,6 +10,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Aether.Client.Services.AccountService;
 using Aether.Client.Services.AdminService;
+using Aether.Client.Services.ViewBudgetService;
 
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);

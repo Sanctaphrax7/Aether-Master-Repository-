@@ -42,10 +42,6 @@ namespace Aether.Client.Services.AdminService
             return response;
         }
 
-        //public async Task SetUser(HttpResponseMessage response)
-        //{
-        //    var message = await response.Content.ReadFromJsonAsync<List<User>>();
-        //    Users = message;
-        //}
+       
     }
 }
