@@ -1,25 +1,53 @@
 ﻿@inherits LayoutComponentBase
-@using System.Security.Claims
-@using Microsoft.AspNetCore.Components.Authorization
 
-@inject HttpClient Http
-@inject IAccountService AccountService 
-@inject NavigationManager Nav
+<MudThemeProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
 
-<div class="page">
-        <div class="sidebar">
-            <NavMenu />
-        </div>
+@* <div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
     <main>
         <div class="top-row px-4">
             <Logout />
         </div>
 
         <article class="content px-4">
-           <div class="main">
-            @Body
+            <div class="main">
+                @Body
             </div>
         </article>
     </main>
-</div>
+</div> *@
 
+
+<MudLayout>
+    <AuthorizeView>
+    <MudAppBar>
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color ="Color.Inherit" Edge ="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
+        Aether
+    </MudAppBar>
+   
+    <MudDrawer @bind-Open="@_drawerOpen">
+        <NavMenu/>
+    </MudDrawer>
+    </AuthorizeView>
+    <MudMainContent>
+      
+        <MudContainer MaxWidth="MaxWidth.Medium">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+
+@code {
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+}

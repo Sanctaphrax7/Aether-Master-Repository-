@@ -17,7 +17,7 @@ namespace Aether.Server.Authentication
         {
              var userAccountList = _context.Users.FirstOrDefault(x => x.UserName == userName);
 
-             return userAccountList; //.FirstOrDefault(x => x.UserName == userName);
+             return userAccountList; 
         }
     }
 }

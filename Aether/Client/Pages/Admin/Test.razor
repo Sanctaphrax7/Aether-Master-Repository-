@@ -1,72 +1,100 @@
-﻿@* @page "/test"
+﻿@page "/test"
 @using System.Net.Http.Headers
 @inject IAdminService AdminService
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @inject AuthStateProvider AuthProvider
+@inject AppStateManager AppState
 @attribute [Authorize(Roles = "Admin , SuperAdmin")]
 
+<h3>Administrative Panel</h3>
+<p>This page is designated for updating users and reassigning roles</p>
 
-<h3>TEST PAGE</h3>
-<EditForm Model ="users" OnSubmit="">
-<div class="col-3">
-    <label>User Name</label>
-    <InputSelect @bind-Value="@selectedUserName" class="form-select">
-        @foreach (var users in AdminService.Users)
-        {
-            <option value="@users.UserName">@users.UserName - @users.Name</option>
-        }
-    </InputSelect>
-</div>
-<div class="col-3">
-    <label for="" class="form-label">Name</label>
-    <InputText @bind-Value="users.Name" class="form-control mb-2" placeholder="Given Name"/>
-</div>
-<div class="col-3">
-    <label for="@nameof(selectedRole)" class="form-label">Assign Role</label>
-    <InputSelect @bind-Value="selectedRole" class="form-select mb-2">
-        @if (!string.IsNullOrEmpty(selectedUserName))
-        {
-            var selectedUser = AdminService.Users.FirstOrDefault((u => u.UserName == selectedUserName));
-            if (selectedUser != null)
+ <EditForm Model="users" OnSubmit="UpdateUser"> 
+    <MudItem>
+            <MudSelect Label="UserName" ValueChanged="@((string value) => UpdateComponent(value))" Class="form-select mb-4">
+            @foreach (var users in AdminService.Users)
             {
-                <option value="@selectedUser.Role">@selectedUser.Role</option>
-
+                <MudSelectItem Value="@users.UserName">@users.UserName @users.Name</MudSelectItem>
             }
-        }
-        
-    </InputSelect>
-</div>
-</EditForm>
+        </MudSelect>
+    </MudItem>
+     <div class="col-3">
+         <label for="" class="form-label">Name</label>
+         <InputText @bind-Value="users.Name" class="form-control mb-2" placeholder="Given Name" />
+     </div>
+     <MudItem>
+         <MudSelect Label="AssignRole" @bind-Value="users.Role" Class="form-select mb-4">
+             @foreach (var role in AdminService.Roles)
+             {
+                 <MudSelectItem Value="@role.Roles">@role.Roles</MudSelectItem>
+             }
+         </MudSelect>
+     </MudItem>
+    
+   
+    <MudSwitch @bind-Checked="@isEnabled" Color="Color.Primary" >@(isEnabled ? "Enabled":"Disabled")</MudSwitch>
+
+    <div>
+        <button class="btn btn-primary mb-4" @onclick="CreateUser">Create New User</button>
+    </div>
+    <div>
+        <button class="btn btn-primary mb-4" @onclick="UpdateUser">Update User</button>
+    </div>
+
+
+ </EditForm> 
+ 
 
 @code {
-    string selectedUserName;
-    string selectedRole;
-    User selectedUser;
+    User users = new();
+    Role roles = new();
+    string selectUserName;
+    User selectedUser = new();
+    bool isSubmitting = false;
+    bool isEnabled = false;
+    public string enabled { get; set; } = "Disabled";
+
     private async Task GetAuthState()
     {
-        
+
         var token = await AuthProvider.GetToken();
-        if(!string.IsNullOrWhiteSpace(token))
+        if (!string.IsNullOrWhiteSpace(token))
         {
             Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
         }
     }
 
-
     protected override async Task OnInitializedAsync()
     {
         await Task.WhenAll(GetUserList(), GetRoleList());
-        selectedUser = AdminService.Users.FirstOrDefault();
+        if (AdminService.Users.Count > 0)
+        {
+            users = AdminService.Users[0];
+            selectUserName = AdminService.Users[0].UserName;
+            AppState.OnStateChange += StateHasChanged;
+
+        }
+    }
+    public Task UpdateComponent(string value)
+    {
+        users = AppState.UpdateState(value);
+        return Task.CompletedTask;
+    }
+
+
+    public void Dispose()
+    {
+        AppState.OnStateChange -= StateHasChanged;
     }
 
     private async Task GetUserList()
     {
-        
+
         await GetAuthState();
         await AdminService.GetUserList();
     }
-    
+
     private async Task GetRoleList()
     {
 
@@ -74,4 +102,72 @@
         await AdminService.GetRoleList();
     }
 
-} *@
+    private async Task CreateUser()
+    {
+        await GetAuthState();
+        NavigationManager.NavigateTo("/adduser");
+    }
+
+    private async Task UpdateUser()
+    {
+        isSubmitting = true;
+        try
+        {
+            await GetAuthState();
+            bool switchState = isEnabled;
+
+            users.Enabled = switchState == true;
+           
+            await AdminService.UpdateUser(users);
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+    public class CustomConverter : BoolConverter<string>
+    {
+        public CustomConverter()
+        {
+            SetFunc = OnSet;
+            GetFunc = OnGet;
+        }
+
+        private string TrueString = "Enabled";
+        private string FalseString = "Disabled";
+        private string NullString = "No Value Selected";
+
+        private string OnGet(bool? value)
+        {
+            try
+            {
+                return (value == true) ? TrueString : FalseString;
+            }
+            catch (Exception e)
+            {
+                UpdateGetError("Conversion Error:" + e.Message);
+                return NullString;
+            }
+        }
+
+        private bool? OnSet(string arg)
+        {
+            if (arg == null)
+                return null;
+            try
+            {
+                if (arg == TrueString)
+                    return true;
+                if (arg == FalseString)
+                    return false;
+                else
+                    return null;
+            }
+            catch (FormatException e)
+            {
+                UpdateSetError("Conversion error: " + e.Message);
+                return null;
+            }
+        }
+    } 
+}

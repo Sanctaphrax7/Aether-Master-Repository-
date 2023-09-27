@@ -1,0 +1,63 @@
+﻿@page "/simple"
+@using System.Net.Http.Headers
+@inject IAdminService AdminService
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject AuthStateProvider AuthProvider
+@inject AppStateManager AppState
+
+<h3>SimpleTest</h3>
+
+@* <CascadingValue Value ="users">
+ *@    <div class="col=3">
+        <label for="parent" class ="form-label">UserName</label>
+    <InputSelect ValueExpression="@(()=>selectUserName)" Value="selectUserName" class="form-select" ValueChanged="@((string value) => UpdateComponent(value))">
+            @foreach (var users in AdminService.Users)
+            {
+                <option value="@users.UserName">@users.UserName</option>
+            }
+        </InputSelect>
+    </div>
+@* </CascadingValue> *@
+<div class="col-3">
+    <label for="child" class="form-label">Name</label>
+    <InputText @bind-Value="users.Name" class="form-control mb-2" placeholder="Given Name" />
+</div>
+
+@code {
+    User users = new();
+    string selectUserName;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.WhenAll(GetUserList(), GetRoleList());
+        if (AdminService.Users.Count > 0)
+        {
+           users = AdminService.Users[0];
+           selectUserName = AdminService.Users[0].UserName;
+            AppState.OnStateChange += StateHasChanged;
+        }
+
+    }
+    public Task UpdateComponent(string value)
+    {
+       users = AppState.UpdateState(value);
+        return Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        AppState.OnStateChange -= StateHasChanged;
+    }
+
+    private async Task GetUserList()
+    {
+        await AdminService.GetUserList();
+    }
+
+    private async Task GetRoleList()
+    {
+        await AdminService.GetRoleList();
+    }
+
+}

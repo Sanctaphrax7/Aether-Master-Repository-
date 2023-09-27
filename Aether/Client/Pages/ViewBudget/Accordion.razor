@@ -5,109 +5,93 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @inject AuthStateProvider AuthProvider
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous" defer></script>
  
 <h3>Accordion Budget Data</h3>
 
-@* <div class="accordion" id="accordionExample">
-    <div class="accordion-item">
-        <h2 class="accordion-header" id="headingOne">
-            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                Accordion Item #1
-            </button>
-        </h2>
-        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-            <div class="accordion-body">
-                <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-            </div>
-        </div>
-    </div>
-    <div class="accordion-item">
-        <h2 class="accordion-header" id="headingTwo">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                Accordion Item #2
-            </button>
-        </h2>
-        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-            <div class="accordion-body">
-                <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-            </div>
-        </div>
-    </div>
-    <div class="accordion-item">
-        <h2 class="accordion-header" id="headingThree">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                Accordion Item #3
-            </button>
-        </h2>
-        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
-            <div class="accordion-body">
-                <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-            </div>
-        </div>
-    </div>
-</div> *@
- 
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Division</th>
-            <th scope="col">Gl Account No.</th>
-            <th scope="col">Gl Dept No.</th>
-            <th scope="col">Sub Account No.</th>
-            <th scope="col">Per Amt</th>
-            <th scope="col">Company No.</th>
-            <th scope="col">Fiscal Year</th>
-            <th scope="col">Fiscal Month</th>
-            <th scope="col">CalMonth</th>
-            <th scope="col">Revision No.</th>
-            <th scope="col">Last Updated</th>
-            <th scope="col">Updated</th>
-            <th scope="col">Details</th>
-            <th scope="col">Edit</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var budget in ViewBudgetService.Budgets)
-        {
-            <tr data-toggle="collapse" data-target="@($"#demo{budget.Id}")" class="accordion-toggle" id="accordionRow">
-                <td>@budget.Division </td>
-                <td>@budget.GlAccountNo </td>
-                <td>@budget.GlDeptNo </td>
-                <td>@budget.SubAccountNo </td>
-                <td>@budget.PerAmt </td>
-                <td>@budget.CompanyNo </td>
-                <td>@budget.FiscalYear </td>
-                <td>@budget.FiscalMonth </td>
-                <td>@budget.CalMonth </td>
-                <td>@budget.RevisionNo </td>
-                <td>@budget.LastUpdated </td>
-                <td>@budget.UpdatedBy </td>
-                <td>
-                    <button class="btn btn-default btn-xs collapsed" type="button" data-bs-toggle="collapse" data-bs-target="@($"#demo{budget.Id}")" aria-expanded="false" aria-controls="demo">
-                        <span class="oi oi-eye"></span>
-                    </button>
-                </td>
-                <td>
-                    <AuthorizeView Roles="Admin">
-                        <button class="btn btn-primary" @onclick="(() => ShowBudget(budget.Id))"><i class="oi oi-pencil"></i></button>
-                    </AuthorizeView>
-                </td>
-            </tr>
 
-            <tr>
-                <td colspan="12" class="hiddenRow">
-                    <div class="accordion-body collapse collapse" id="@($"#demo{budget.Id}")" data-bs-parent="#accordionRow">
-                        <p>Testing</p>
-                    </div>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+
+<MudTable Items="ViewBudgetService.Budgets" Style ="width: 200%; horiz-align: left" FixedHeader="true" FixedFooter="true" Height="900px">
+    <ColGroup>
+        <col style="width: 100px" />
+        <col style="width: 220px" />
+        <col style="width: 200px" />
+        <col style="width: 240px" />
+        <col style="width: 10%" />
+        <col style="width: 210px" />
+        <col style="width: 80px" />
+        <col style="width: 240px" />
+        <col style="width: 200px" />
+        <col style="width: 220px" />
+        <col style="width: 12%" />
+        <col style="width: 200px" />
+        <col style="width: 200px" />
+        <col style="width: 200px" />
+    </ColGroup>
+    <HeaderContent>
+        <MudTh Style="width: 200px; text-align:center">Division</MudTh>
+        <MudTh Style="width: 200px; text-align:center">Gl Account No</MudTh>
+        <MudTh Style="width: 200px; text-align:center">Gl Dept No</MudTh>
+        <MudTh Style="width: 250px; text-align:center">Sub Account No</MudTh>
+        <MudTh Style="width: 250px; text-align:center">Per Amt</MudTh>
+        <MudTh Style="width: 200px; text-align:center">Company No</MudTh>
+        <MudTh Style="width: 200px; text-align:center">Fiscal Year</MudTh>
+        <MudTh Style="width: 220px; text-align:center">Fiscal Month</MudTh>
+        <MudTh Style="width: 220px; text-align:center">Cal Month</MudTh>
+        <MudTh Style="width: 220px; text-align:center">Revision No</MudTh>
+        <MudTh Style="width: 220px; text-align:center">Last Updated</MudTh>
+        <MudTh Style="width: 60px;  text-align:center">Updated By</MudTh>
+        <MudTh Style="width: 220px; text-align:center">Details</MudTh>
+        <MudTh Style="width: 220px; text-align:center">Edit</MudTh>
+    </HeaderContent>
+   
+    <RowTemplate Context="budget">
+        <MudTd DataLabel="Division">@budget.Division</MudTd>
+        <MudTd DataLabel="GlAccountNo">@budget.GlAccountNo</MudTd>
+        <MudTd DataLabel="GlDeptNo"> @budget.GlDeptNo</MudTd>
+        <MudTd DataLabel="SubAccountNo">@budget.SubAccountNo</MudTd>
+        <MudTd DataLabel="PerAmt">@budget.PerAmt</MudTd>
+        <MudTd DataLabel="CompanyNo">@budget.CompanyNo</MudTd>
+        <MudTd DataLabel="FiscalYear">@budget.FiscalYear</MudTd>
+        <MudTd DataLabel="FiscalMonth">@budget.FiscalMonth</MudTd>
+        <MudTd DataLabel="CalMonth">@budget.CalMonth</MudTd>
+        <MudTd DataLabel="RevisionNo">@budget.RevisionNo</MudTd>
+        <MudTd DataLabel="LastUpdated">@budget.LastUpdated</MudTd>
+        <MudTd DataLabel="UpdatedBy">@budget.UpdatedBy</MudTd>
+        <MudTd DataLabel="Details">
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowDropDown" Color="Color.Secondary" Size="Size.Small">Details</MudButton>
+        </MudTd>
+        <MudTd DataLabel="Edit">
+            <AuthorizeView Roles="Admin">
+                @*<button class="btn btn-primary" @onclick="(() => ShowBudget(context.Id))"><i class="oi oi-pencil"></i></button> *@
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" OnClick="(() => ShowBudget(budget.Id))"> Edit</MudButton>
+            </AuthorizeView>
+        </MudTd>
+
+    </RowTemplate>
+    <ChildRowContent>
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h5">Here below is a comment!</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText>This is the comment!</MudText>
+                <MudText>Maybe in future I would be editable from right here</MudText>
+            </MudCardContent>
+        </MudCard>
+    </ChildRowContent>
+    <PagerContent>
+        <MudTablePager PageSizeOptions="new int[] { 25, 50, 100 }"/>
+    </PagerContent>
+</MudTable>
 
 @code {
+    // bool _fixed_header = true;
+    // bool _fixed_footer = true;
+    private BudgetDatum budgets = new();
+   // private List<BudgetDatum> budgets = new();
+   //TODO Test out using MudDataGrid instead...>.>
     private async Task GetAuthState()
     {
 

@@ -1,7 +1,7 @@
 ﻿@using System.Net.Http.Headers
 @inject HttpClient Http
 
-  <AuthorizeView>
+@*   <AuthorizeView>
       <Authorized>
     <div class="top-row ps-3 nav<Hero />bar navbar-dark">
         <div class="container-fluid">
@@ -46,27 +46,43 @@
             </Authorized>
         </AuthorizeView>
          
-        @*<div class="nav-item px-3">
+        <div class="nav-item px-3">
             <NavLink class="nav-link" href="fetchdata">
                 <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
             </NavLink>
-        </div>*@
+        </div>
         </nav>
     </div>
-
-
+ *@
+<MudNavMenu>
+    <AuthorizeView>
+        <Authorized>
+            <MudNavLink Href="/home" Match="NavLinkMatch.All">Aether</MudNavLink>
+            <MudNavLink Href="/UploadFile" Match="NavLinkMatch.All">Upload File</MudNavLink>
+            <MudNavGroup Title="View Budgets">
+                <MudNavLink Href="/viewbudget" Match="NavLinkMatch.All">Budget Data</MudNavLink>
+                <MudNavLink Href="/accordion" Match="NavLinkMatch.All">Comments</MudNavLink>
+            </MudNavGroup>
+            <MudNavLink Href="/test" Match="NavLinkMatch.All">Admin Panel</MudNavLink>
+            <MudNavLink Href="/simple" Match="NavLinkMatch.All">Test Admin Panel</MudNavLink>
+            <MudContainer>
+                <Logout/>
+            </MudContainer>
+        </Authorized>
+    </AuthorizeView>
+</MudNavMenu>
 
 @code {
 
+    // void OnStateChange(object sender, EventArgs e) => OnStateChange();
+    // private bool collapseNavMenu = true;
 
-    private bool collapseNavMenu = true;
+    // private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    // private void ToggleNavMenu()
+    // {
+    //     collapseNavMenu = !collapseNavMenu;
+    // }
 
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
 
-  
 }

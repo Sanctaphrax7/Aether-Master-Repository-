@@ -3,7 +3,6 @@ using System.Security.Claims;
 using System.Text;
 using Aether.Shared.Models;
 using Microsoft.IdentityModel.Tokens;
-using Aether.Client.Services.AuthStateProvider;
 
 namespace Aether.Server.Authentication
 {
