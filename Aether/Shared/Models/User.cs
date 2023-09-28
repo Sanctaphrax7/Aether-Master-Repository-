@@ -1,10 +1,9 @@
 ﻿using CsvHelper.Configuration;
-using System;
-using System.Collections.Generic;
+
 
 namespace Aether.Shared.Models;
 
-public partial class User
+public class User
 {
     public int Id { get; set; }
 
@@ -18,9 +17,10 @@ public partial class User
 
     public virtual ICollection<BudgetDatum> BudgetData { get; set; } = new List<BudgetDatum>();
 
+    public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
+
     public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
 }
-
 public sealed class UserMap : ClassMap<User>
 {
     public UserMap()

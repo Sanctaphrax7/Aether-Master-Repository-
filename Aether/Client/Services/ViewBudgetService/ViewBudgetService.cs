@@ -16,6 +16,8 @@ namespace Aether.Client.Services.ViewBudgetService
         public List<BudgetDatum> Budgets { get; set; } = new List<BudgetDatum>();
         public List<User> Users { get; set; } = new List<User> ();
 
+        public List<Comment> Comments { get; set; } = new List<Comment>();
+
         public async Task CreateBudget(BudgetDatum budget)
         {
             var result = await _http.PostAsJsonAsync("api/viewbudget", budget);
@@ -27,6 +29,11 @@ namespace Aether.Client.Services.ViewBudgetService
             var response = await result.Content.ReadFromJsonAsync<List<BudgetDatum>>();
             Budgets = response;
             _navigationManager.NavigateTo("viewbudget");
+        } private async Task SetBudgetComment(HttpResponseMessage result)
+        {
+            var response = await result.Content.ReadFromJsonAsync<List<Comment>>();
+            Comments = response;
+           // _navigationManager.NavigateTo("viewbudget");
         }
         public async Task DeleteBudget(int id)
         {
@@ -55,9 +62,14 @@ namespace Aether.Client.Services.ViewBudgetService
         //public async Task GetComment() //TODO To Be Implemented 
         //{
         //    var result = await _http.GetFromJsonAsync<List<BudgetDatum>>("api/viewbudget/comment");
-        //    if (result != null)
         //        await SetBudgetComment(result);
         //}
+        public async Task SaveComment(Comment comment)
+        {
+            var result = await _http.PostAsJsonAsync("api/viewbudget/comment", comment);
+            await SetBudgetComment(result);
+        }
+
         public async Task UpdateBudget(BudgetDatum budget)
         {
             var result = await _http.PutAsJsonAsync($"api/viewbudget/{budget.Id}", budget);

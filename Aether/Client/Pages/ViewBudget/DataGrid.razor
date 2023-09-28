@@ -1,0 +1,85 @@
+﻿@page "/datagrid"
+@using System.Net.Http.Headers
+@using Aether.Client.Services.ViewBudgetService
+@inject IViewBudgetService ViewBudgetService
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject AuthStateProvider AuthProvider
+
+
+<h3>DataGrid</h3>
+
+<MudDataGrid Items="ViewBudgetService.Budgets" EditMode="DataGridEditMode.Cell">
+    <Columns>
+        <HierarchyColumn T ="BudgetDatum"/> 
+        <PropertyColumn Property="x => x.Division"/>
+        <PropertyColumn Property="x => x.GlAccountNo"/>
+        <PropertyColumn Property="x => x.GlDeptNo"/>
+        <PropertyColumn Property="x => x.SubAccountNo"/>
+        <PropertyColumn Property="x => x.PerAmt" Format="C"/>
+        <PropertyColumn Property="x => x.CompanyNo"/>
+        <PropertyColumn Property="x => x.FiscalYear"/>
+        <PropertyColumn Property="x => x.FiscalMonth"/>
+        <PropertyColumn Property="x => x.CalMonth"/>
+        <PropertyColumn Property="x => x.RevisionNo"/>
+        <PropertyColumn Property="x => x.LastUpdated"/>
+        <PropertyColumn Property="x => x.UpdatedBy"/>
+        <TemplateColumn>
+            <CellTemplate>
+                <MudStack Row>
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowDropDown" Color="Color.Secondary" Size="Size.Small">Details</MudButton>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn>
+            <CellTemplate>
+                <MudStack Row>
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" OnClick="(() => ShowBudget(budgets.Id))"> Edit</MudButton>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <ChildRowContent>
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo ="Typo.h5">Here below is a comment!</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText>This the comment</MudText>
+            </MudCardContent>
+        </MudCard>
+    </ChildRowContent>
+</MudDataGrid>
+
+@code {
+    private BudgetDatum budgets = new();
+    private Comment comments = new();
+
+
+    private async Task GetAuthState()
+    {
+
+        var token = await AuthProvider.GetToken();
+        if (!string.IsNullOrWhiteSpace(token))
+        {
+            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAuthState();
+        await ViewBudgetService.GetBudget();
+    }
+
+    async Task ShowBudget(int id)
+    {
+        await GetAuthState();
+        NavigationManager.NavigateTo($"edit/{id}");
+
+
+    }
+
+}

@@ -63,7 +63,7 @@
         <MudTd DataLabel="Edit">
             <AuthorizeView Roles="Admin">
                 @*<button class="btn btn-primary" @onclick="(() => ShowBudget(context.Id))"><i class="oi oi-pencil"></i></button> *@
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" OnClick="(() => ShowBudget(budget.Id))"> Edit</MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" OnClick="(() => ShowBudget(budgets.Id))"> Edit</MudButton>
             </AuthorizeView>
         </MudTd>
 
@@ -77,7 +77,8 @@
             </MudCardHeader>
             <MudCardContent>
                 <MudText>This is the comment!</MudText>
-                <MudText>Maybe in future I would be editable from right here</MudText>
+                    <MudTextField @bind-Value="comments.UploadComment" Label="Outlined" Variant="Variant.Outlined" Lines="6" />
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" @onclick="SaveComment"></MudButton>
             </MudCardContent>
         </MudCard>
     </ChildRowContent>
@@ -90,8 +91,9 @@
     // bool _fixed_header = true;
     // bool _fixed_footer = true;
     private BudgetDatum budgets = new();
-   // private List<BudgetDatum> budgets = new();
+    private Comment comments = new();
    //TODO Test out using MudDataGrid instead...>.>
+    
     private async Task GetAuthState()
     {
 
@@ -117,7 +119,13 @@
     // {
     //     await GetAuthState();
     //     await ViewBudgetService.GetComment(id);
-    // }
+    // }  
+    async Task SaveComment()
+    {
+        await GetAuthState();
+        await ViewBudgetService.SaveComment(comments);
+
+    }
     async Task CreateBudget()
     {
         await GetAuthState();

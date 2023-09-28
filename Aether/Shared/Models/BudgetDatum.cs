@@ -7,9 +7,9 @@ namespace Aether.Shared.Models;
 
 public class BudgetDatum
 {
-
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
     public int Id { get; set; }
 
     public string Division { get; set; } = null!;
@@ -39,7 +39,14 @@ public class BudgetDatum
     public string? UpdatedBy { get; set; }
 
     public string? FileName { get; set; }
-    public User? User { get; set; }
+
+    public int? CommentId { get; set; }
+
+    public virtual Comment? Comment { get; set; }
+
+    public virtual User User { get; set; } = null!;
+
+
 
     private static int GetFiscalYear()
     {
@@ -95,3 +102,4 @@ public sealed class BudgetDatumMap : ClassMap<BudgetDatum>
 
     }
 }
+

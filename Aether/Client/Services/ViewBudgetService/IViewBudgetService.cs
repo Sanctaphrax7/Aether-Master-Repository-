@@ -8,6 +8,7 @@
         Task GetBudget();
         Task<BudgetDatum> GetThisBudget(int id);
         //Task GetComment(int id); //TODO To Be Implemented
+        Task SaveComment(Comment comment); //TODO To be Implemented
         Task CreateBudget(BudgetDatum budget);
         Task UpdateBudget(BudgetDatum budget);
         Task DeleteBudget(int id);

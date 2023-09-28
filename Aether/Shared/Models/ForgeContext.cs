@@ -19,6 +19,8 @@ public partial class ForgeContext : DbContext
 
     public virtual DbSet<BudgetDatum> BudgetData { get; set; }
 
+    public virtual DbSet<Comment> Comments { get; set; }
+
     public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -76,10 +78,28 @@ public partial class ForgeContext : DbContext
             entity.Property(e => e.PerAmt).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.UpdatedBy).IsUnicode(false);
 
+            entity.HasOne(d => d.Comment).WithMany(p => p.BudgetData)
+                .HasForeignKey(d => d.CommentId)
+                .HasConstraintName("FK__BudgetDat__Comme__41EDCAC5");
+
             entity.HasOne(d => d.User).WithMany(p => p.BudgetData)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__BudgetDat__UserI__17F790F9");
+        });
+
+        modelBuilder.Entity<Comment>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Comments__3214EC0735A64719");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.TimeStamp).HasColumnType("datetime");
+            entity.Property(e => e.UploadComment).IsUnicode(false);
+
+            entity.HasOne(d => d.User).WithMany(p => p.Comments)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Comments__UserId__40058253");
         });
 
         modelBuilder.Entity<Role>(entity =>

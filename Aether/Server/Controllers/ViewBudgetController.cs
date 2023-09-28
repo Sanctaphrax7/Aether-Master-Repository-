@@ -54,6 +54,15 @@ namespace Aether.Server.Controllers
         //{
         //    throw new NotImplementedException();
         //}
+        [HttpPost]
+        public async Task<ActionResult<List<Comment>>> SaveComment(Comment comment)
+        {
+            _context.Comments.Add(comment);
+            comment.TimeStamp = DateTime.Now;
+            await _context.SaveChangesAsync();
+
+            return Ok(comment);//May Need to await GetDbBudgets to update comments. Not sure...
+        }
       
         [HttpPost]
         public async Task<ActionResult<List<BudgetDatum>>> CreateBudget(BudgetDatum budget)

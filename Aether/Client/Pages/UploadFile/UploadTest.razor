@@ -1,0 +1,146 @@
+﻿@page "/UploadTest"
+@using System.Net.Http.Headers
+@using System.Data.SqlClient
+@using Aether.Shared.Models
+@using System.Text.Json
+@using Microsoft.EntityFrameworkCore
+@inject AuthStateProvider AuthProvider
+@inject NavigationManager Nav
+@inject HttpClient Http
+@inject IJSRuntime jsr
+@attribute [Authorize(Roles = "Admin, User")]
+
+<PageTitle>Upload Csv Files</PageTitle>
+
+<h1 class="text-center">Upload Budget CSV file below</h1>
+
+@if (!string.IsNullOrEmpty(uploadMessage))
+{
+
+    <div class="alert alert-success" role="alert">
+        @uploadMessage
+    </div>
+}
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+
+}
+
+<div>
+    <InputFile OnChange="OnInputFileChange" class="form-control" multiple accept=".csv" />
+</div>
+
+ 
+<div>
+    <button class="btn btn-primary mt-3 alert" type="submit" @onclick="UploadFiles" disabled="@isUploading">Submit Budget</button>
+</div>
+
+
+
+
+@code {
+    private int maxAllowedFiles = int.MaxValue;
+    private long maxFileSize = long.MaxValue;
+    private List<string> fileNames = new();
+    private List<BudgetDatum> BudgetData = new();
+    private List<IBrowserFile> selectedFiles = new();
+    private bool isUploading = false;
+    private string? uploadMessage;
+    private string? errorMessage;
+    private string userdata;
+    private string userName;
+    //private string FileUploader;
+
+    private void OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        selectedFiles = e.GetMultipleFiles(maxAllowedFiles).ToList();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        userName = user.Identity.Name;
+
+
+    }
+    private async Task UploadFiles()
+    {
+        try
+        {
+            isUploading = true;
+
+            using var content = new MultipartFormDataContent();
+
+            var jsonOptions = new JsonSerializerOptions
+                {
+                    UnknownTypeHandling = new System.Text.Json.Serialization.JsonUnknownTypeHandling()
+                };
+
+            foreach (var file in selectedFiles)
+            {
+                var fileContent = new StreamContent(file.OpenReadStream(maxFileSize));
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+                fileNames.Add(file.Name);
+
+                // content.Add(new StringContent(userName), "userName");//Change 1/9/2023
+                content.Add(fileContent, "\"files\"", file.Name);
+            }
+
+            var token = await AuthProvider.GetToken();
+            if (!string.IsNullOrWhiteSpace(token))
+            {
+                Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+                var response = await Http.PostAsync("/api/File/upload", content);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+
+                    uploadMessage = "Budget File Uploaded Successfully!";
+                    errorMessage = null;
+                }
+                else
+                {
+                    errorMessage = response.Content.ToString();
+                }
+            }
+            else
+            {
+                Nav.NavigateTo("/");
+            }
+            //response.Headers.Add("Authorization", "Bearer" + await GetJWT());
+
+            // var request = new HttpRequestMessage(HttpMethod.Get, "/api/File");
+            // request.Headers.Add("Authorization", "Bearer" + await GetJWT());
+            // var response = await Http.SendAsync(request);
+
+
+        }
+        catch (DbUpdateException ex)
+        {
+            if (ex.InnerException is SqlException sqlException /*&& sqlException.Number == 2601*/)
+            {
+                errorMessage = "The uploaded budget contains duplicate entries!";
+            }
+            else
+            {
+                errorMessage = "There was an error with the budget upload and the inner SQL Exception";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.StackTrace;
+        }
+        finally
+        {
+            isUploading = false;
+
+        }
+
+    }
+
+
+}
