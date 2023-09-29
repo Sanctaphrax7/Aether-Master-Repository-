@@ -9,7 +9,7 @@
 <h1>Sign In</h1>
 
 
-<form>
+@* <form>
     <EditForm Model="creds" OnValidSubmit="Login">
     <div class="col-3">
         <label for="username">Username</label>
@@ -21,13 +21,29 @@
     </div>
     <button type="submit" class="btn btn-primary btn-block" @onclick="Login">Sign In</button>
     </EditForm>
-</form>
+</form> *@
 
-
+<MudGrid>
+    <MudItem xs="12" sm="7">
+        <EditForm Model="creds">
+        <MudPaper Class="pa-4">
+            <MudForm @ref="form">
+                <MudTextField T="string" Label="User Name" Required="true" RequiredError="User Name is required!" @bind-Value="creds.UserName"/>
+                <MudTextField T="string" Label="Password" HelperTextOnFocus="true" HelperText="Enter Active Directory Password" Required="true" RequiredError="Password is required!" InputType="InputType.Password" @bind-Value="creds.Password"/>
+            </MudForm>
+        </MudPaper>
+        <MudPaper Class="pa-4 mt-4">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="Login">Login</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" DisableElevation="true" Class="mx-2" OnClick="@(() => form.ResetAsync())">Reset</MudButton>
+        </MudPaper>
+        </EditForm>
+    </MudItem>
+</MudGrid>
 
 @code {
     private string? errorMessage;
     UserDto creds = new UserDto();
+    MudForm form;
 
 
     private async Task Login()

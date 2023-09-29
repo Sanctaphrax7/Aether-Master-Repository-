@@ -8,8 +8,8 @@
 
 
 <h3>DataGrid</h3>
-
-<MudDataGrid Items="ViewBudgetService.Budgets" EditMode="DataGridEditMode.Cell">
+<MudContainer MaxWidth="MaxWidth.ExtraExtraLarge">
+<MudDataGrid Items="ViewBudgetService.Budgets" EditMode="DataGridEditMode.Cell" Virtualize="true" FixedHeader="true" Height ="900px" Class="">
     <Columns>
         <HierarchyColumn T ="BudgetDatum"/> 
         <PropertyColumn Property="x => x.Division"/>
@@ -52,7 +52,7 @@
         </MudCard>
     </ChildRowContent>
 </MudDataGrid>
-
+</MudContainer>
 @code {
     private BudgetDatum budgets = new();
     private Comment comments = new();
